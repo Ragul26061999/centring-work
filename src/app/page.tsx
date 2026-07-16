@@ -16,9 +16,12 @@ import {
   Wrench,
   Menu,
   X,
+  User,
+  MessageSquare,
 } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
+import { sendEmail } from "@/app/actions/sendEmail";
 
 /* ─────────────────────── Parallax Image Component ─────────────────────── */
 function ParallaxBackground({
@@ -65,6 +68,35 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Form state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  
+  async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formElement = e.currentTarget;
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+    setErrorMessage("");
+    const formData = new FormData(formElement);
+    try {
+      const result = await sendEmail(formData);
+      if (result.success) {
+        setSubmitStatus("success");
+        formElement.reset();
+      } else {
+        setSubmitStatus("error");
+        setErrorMessage(result.error || "Failed to send message. Please try again later.");
+      }
+    } catch (err: any) {
+      setSubmitStatus("error");
+      setErrorMessage(err.message || "Failed to send message. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   const sectionIds = ["home", "materials", "services", "about", "contact"];
 
@@ -121,10 +153,10 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       {/* ══════════════════ Navigation ══════════════════ */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? "bg-background/90 backdrop-blur-md shadow-lg shadow-black/[0.04] py-3"
-            : "bg-background/60 lg:bg-transparent lg:bg-gradient-to-b lg:from-background/80 lg:to-transparent py-4 lg:py-6 backdrop-blur-sm lg:backdrop-blur-none"
+            ? "bg-background/95 backdrop-blur-lg shadow-md border-b border-border/40 py-3"
+            : "bg-gradient-to-b from-background/95 via-background/70 to-transparent pt-6 pb-12"
         }`}
       >
         <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between">
@@ -132,15 +164,17 @@ export default function Home() {
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => scrollTo("home")}
           >
-            <div className="bg-primary p-2 rounded-lg text-primary-foreground">
-              <Construction size={24} />
-            </div>
-            <span className="font-bold text-xl tracking-tight">
-              Centring<span className="text-primary">Work</span>
-            </span>
+            <Image
+              src="/magest-final-log -Photoroom.png"
+              alt="Om Dealer Centering Materials Logo"
+              width={400}
+              height={100}
+              className="object-contain h-14 w-auto md:h-14"
+              priority
+            />
           </div>
 
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center space-x-1 bg-background/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-foreground/5 shadow-sm">
             {navLinks.map((link) => (
               <button
                 key={link.name}
@@ -224,63 +258,72 @@ export default function Home() {
           className="relative min-h-screen flex items-center pt-20 overflow-hidden"
         >
           <ParallaxBackground
-            src="/hero_background.png"
-            alt="Construction Scaffolding Background"
-            speed={0.25}
+            src="/hero_centering_modern.png"
+            alt="Modern Centering Materials Background"
+            speed={0.2}
             priority
             overlay={
-              <div className="absolute inset-0 bg-background/40 md:bg-transparent md:bg-gradient-to-r md:from-background/90 md:via-background/50 md:to-transparent dark:bg-background/60 dark:md:bg-transparent dark:md:bg-gradient-to-r dark:md:from-background/90 dark:md:via-background/60 dark:md:to-transparent z-10" />
+              <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] md:bg-black/10 md:dark:bg-black/30 md:backdrop-blur-none z-10 transition-all" />
             }
           />
 
-          <div className="container relative z-10 mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12 items-center">
+          <div className="container relative z-10 mx-auto px-6 md:px-12 flex flex-col items-center justify-center h-full">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="flex flex-col items-center md:items-start text-center md:text-left"
+              className="flex flex-col items-center text-center max-w-4xl mx-auto relative"
             >
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 drop-shadow-md">
+              {/* Modern radial opacity glow behind text (no box edges) */}
+              <div 
+                className="absolute inset-0 -z-10 scale-[1.5] md:scale-[2] pointer-events-none" 
+                style={{ background: 'radial-gradient(circle, var(--color-background) 0%, transparent 70%)' }} 
+              />
+
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 drop-shadow-lg relative z-10">
                 Build with{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">
+                <span className="text-[#846437]">
                   Strength
                 </span>{" "}
-                &amp; Confidence
+                &amp;{" "}
+                <span className="text-[#846437]">
+                  Confidence
+                </span>
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-foreground/90 font-medium mb-8 max-w-lg leading-relaxed drop-shadow-md">
-                Top-tier scaffolding, formwork, and centring materials for rent.
+              <p className="text-base sm:text-lg md:text-2xl text-foreground/90 font-medium mb-10 max-w-2xl leading-relaxed drop-shadow-md">
+                Top-tier scaffolding, formwork, and centering materials supplying.
                 Reliable equipment for projects of any scale, delivered right to
                 your site.
               </p>
 
-              <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center md:justify-start gap-4 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 w-full sm:w-auto">
                 <button
                   onClick={() => scrollTo("materials")}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 flex items-center gap-2"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full font-bold transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 flex items-center gap-2 text-lg"
                 >
                   Explore Materials
                   <ChevronRight size={20} />
                 </button>
                 <button
                   onClick={() => scrollTo("contact")}
-                  className="bg-secondary text-secondary-foreground border border-border hover:bg-muted px-8 py-4 rounded-full font-medium transition-all flex items-center gap-2"
+                  className="bg-background text-foreground border-2 border-primary hover:bg-primary/10 px-8 py-4 rounded-full font-bold transition-all flex items-center gap-2 text-lg"
                 >
                   <Phone size={20} />
                   Call Us Now
                 </button>
               </div>
 
-              <div className="mt-12 flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm text-foreground/60 font-medium">
+              <div className="mt-14 flex flex-wrap items-center justify-center gap-8 text-sm md:text-base text-foreground/80 font-bold bg-background/40 px-8 py-4 rounded-full backdrop-blur-md border border-white/10 shadow-xl">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="text-primary" size={20} />
+                  <CheckCircle2 className="text-primary" size={24} />
                   ISO Certified
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="text-primary" size={20} />
+                  <CheckCircle2 className="text-primary" size={24} />
                   24/7 Support
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="text-primary" size={20} />
+                  <CheckCircle2 className="text-primary" size={24} />
                   Fast Delivery
                 </div>
               </div>
@@ -296,7 +339,7 @@ export default function Home() {
                 Premium Materials Library
               </h2>
               <p className="text-foreground/70 text-lg">
-                We provide an extensive range of high-grade centring and
+                We provide an extensive range of high-grade centering and
                 scaffolding equipment to ensure safety and efficiency on your
                 construction site.
               </p>
@@ -506,11 +549,11 @@ export default function Home() {
                 transition={{ duration: 0.7 }}
               >
                 <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
-                  About CentringWork
+                  About Om Dealer
                 </h2>
                 <div className="w-20 h-1.5 bg-primary mx-auto rounded-full mb-8" />
                 <p className="text-white/80 text-lg leading-relaxed mb-6">
-                  Established over 15 years ago, CentringWork has grown from a
+                  Established over 15 years ago, Om Dealer has grown from a
                   local supplier into one of the region&apos;s most trusted names in
                   construction equipment rental. We understand that the
                   foundation of any great structure lies in the reliability of
@@ -519,7 +562,7 @@ export default function Home() {
                 </p>
                 <p className="text-white/80 text-lg leading-relaxed">
                   Our mission is to empower builders, contractors, and engineers
-                  with the highest-grade centring materials and scaffolding. By
+                  with the highest-grade centering materials and scaffolding. By
                   providing well-maintained, robust equipment alongside
                   exceptional customer service and timely logistics, we ensure
                   your projects stay on schedule and your workforce stays safe.
@@ -551,7 +594,7 @@ export default function Home() {
                       <p className="text-sm text-background/60 mb-0.5">
                         Call Us
                       </p>
-                      <p className="font-medium">+1 (555) 123-4567</p>
+                      <p className="font-medium">+91 79041 38705</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -562,89 +605,157 @@ export default function Home() {
                       <p className="text-sm text-background/60 mb-0.5">
                         Email Us
                       </p>
-                      <p className="font-medium">rentals@centringwork.com</p>
+                      <p className="font-medium">omdealer7@gmail.com</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="bg-background/10 p-3 rounded-full">
-                      <MapPin size={20} />
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-background/10 p-3 rounded-full shrink-0">
+                        <MapPin size={20} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-background/60 mb-0.5">
+                          Visit Us
+                        </p>
+                        <p className="font-medium">
+                          55, Madavaram Red Hills Rd, Red Hills, Naravarikuppam, Chennai, Tamil Nadu 600052
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-background/60 mb-0.5">
-                        Visit Us
-                      </p>
-                      <p className="font-medium">
-                        123 Construction Ave, BuildCity
-                      </p>
+                    
+                    {/* Small Map Embed */}
+                    <div className="w-full h-[250px] rounded-2xl overflow-hidden shadow-lg border border-background/20 mt-2 lg:ml-14 max-w-sm">
+                      <iframe 
+                        width="100%" 
+                        height="100%" 
+                        style={{ border: 0 }} 
+                        loading="lazy" 
+                        allowFullScreen 
+                        src={`https://maps.google.com/maps?q=${encodeURIComponent("55, Madavaram Red Hills Rd, Red Hills, Naravarikuppam, Chennai, Tamil Nadu 600052")}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                      >
+                      </iframe>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-background text-foreground p-8 md:p-10 rounded-3xl shadow-2xl">
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 text-white p-8 md:p-10 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
                 <h3 className="text-2xl font-bold mb-6">Request a Quote</h3>
                 <form
-                  className="space-y-4"
-                  onSubmit={(e) => e.preventDefault()}
+                  className="space-y-5"
+                  onSubmit={handleFormSubmit}
                 >
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">First Name</label>
+                    <div className="space-y-2 relative">
+                      <label className="text-sm font-medium text-white/90">First Name</label>
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" size={18} />
+                        <input
+                          type="text"
+                          name="firstName"
+                          required
+                          className="w-full pl-11 pr-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                          placeholder="John"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2 relative">
+                      <label className="text-sm font-medium text-white/90">Last Name</label>
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" size={18} />
+                        <input
+                          type="text"
+                          name="lastName"
+                          required
+                          className="w-full pl-11 pr-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                          placeholder="Doe"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2 relative">
+                    <label className="text-sm font-medium text-white/90">Email Address</label>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" size={18} />
                       <input
-                        type="text"
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                        placeholder="John"
+                        type="email"
+                        name="email"
+                        required
+                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        placeholder="john@company.com"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Last Name</label>
+                  </div>
+                  <div className="space-y-2 relative">
+                    <label className="text-sm font-medium text-white/90">Mobile Number</label>
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" size={18} />
                       <input
-                        type="text"
-                        className="w-full px-4 py-3 rounded-xl border border-border bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                        placeholder="Doe"
+                        type="tel"
+                        name="mobile"
+                        required
+                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        placeholder="+91 98765 43210"
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Email Address</label>
-                    <input
-                      type="email"
-                      className="w-full px-4 py-3 rounded-xl border border-border bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                      placeholder="john@company.com"
-                    />
+                  <div className="space-y-2 relative">
+                    <label className="text-sm font-medium text-white/90">Project Details</label>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-4 top-4 text-white/50" size={18} />
+                      <textarea
+                        rows={4}
+                        name="details"
+                        required
+                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
+                        placeholder="Tell us about your material requirements..."
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      Project Details
-                    </label>
-                    <textarea
-                      rows={4}
-                      className="w-full px-4 py-3 rounded-xl border border-border bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
-                      placeholder="Tell us about your material requirements..."
-                    />
-                  </div>
-                  <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-bold transition-all hover:shadow-lg hover:shadow-primary/25 active:scale-95">
-                    Submit Request
+
+                  {submitStatus === "success" && (
+                    <div className="bg-green-500/20 text-green-200 p-3 rounded-lg text-sm text-center border border-green-500/30 font-medium">
+                      Thank you! Your quote request has been sent to our team.
+                    </div>
+                  )}
+                  {submitStatus === "error" && (
+                    <div className="bg-red-500/20 text-red-200 p-3 rounded-lg text-sm text-center border border-red-500/30 font-medium">
+                      {errorMessage}
+                    </div>
+                  )}
+
+                  <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-[#846437] hover:bg-[#9a7743] disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold transition-all hover:shadow-lg hover:shadow-[#846437]/40 active:scale-95 flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? "Sending..." : "Submit Request"}
+                    {!isSubmitting && <ArrowRight size={18} />}
                   </button>
                 </form>
               </div>
             </div>
+
+
           </div>
         </section>
       </main>
 
       {/* ══════════════════ Footer ══════════════════ */}
-      <footer className="bg-foreground text-background/60 py-12 lg:py-16">
+      <footer className="bg-[#eef5fa] dark:bg-[#0a2033] text-foreground/80 py-12 lg:py-16">
         <div className="container mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-6">
-                <Construction size={28} className="text-primary" />
-                <span className="font-bold text-2xl text-background tracking-tight">
-                  Centring<span className="text-primary">Work</span>
-                </span>
+                <Image
+                  src="/magest-final-log -Photoroom.png"
+                  alt="Om Dealer Logo"
+                  width={200}
+                  height={100}
+                  className="object-contain h-14 w-auto"
+                />
               </div>
-              <p className="text-background/60 max-w-sm mb-6 leading-relaxed">
+              <p className="max-w-sm mb-6 leading-relaxed">
                 Your trusted partner in construction material rentals. Providing
                 premium scaffolding and formwork solutions that ensure safety,
                 efficiency, and structural integrity.
@@ -652,7 +763,7 @@ export default function Home() {
             </div>
 
             <div>
-              <h4 className="text-background font-bold text-lg mb-6">
+              <h4 className="text-foreground font-bold text-lg mb-6">
                 Quick Links
               </h4>
               <ul className="space-y-4">
@@ -692,7 +803,7 @@ export default function Home() {
             </div>
 
             <div>
-              <h4 className="text-background font-bold text-lg mb-6">
+              <h4 className="text-foreground font-bold text-lg mb-6">
                 Contact
               </h4>
               <ul className="space-y-4 text-sm">
@@ -701,23 +812,23 @@ export default function Home() {
                     size={18}
                     className="text-primary shrink-0 mt-0.5"
                   />
-                  <span>123 Construction Ave, BuildCity, ST 12345</span>
+                  <span>55, Madavaram Red Hills Rd, Red Hills, Naravarikuppam, Chennai, Tamil Nadu 600052, ST 12345</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone size={18} className="text-primary shrink-0" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>+91 79041 38705</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail size={18} className="text-primary shrink-0" />
-                  <span>rentals@centringwork.com</span>
+                  <span>omdealer7@gmail.com</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
+          <div className="pt-8 border-t border-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
             <p>
-              &copy; {new Date().getFullYear()} CentringWork Materials. All
+              &copy; {new Date().getFullYear()} Om Dealer Centering Materials. All
               rights reserved.
             </p>
             <div className="flex gap-6">
