@@ -359,6 +359,7 @@ export default function Home() {
                     src="/centering_materials.png"
                     alt="Steel Scaffolding"
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
@@ -388,6 +389,7 @@ export default function Home() {
                     src="/formwork_systems.png"
                     alt="Formwork Systems"
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
@@ -417,6 +419,7 @@ export default function Home() {
                     src="/accessories_fittings.png"
                     alt="Accessories and Fittings"
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
@@ -496,6 +499,7 @@ export default function Home() {
                     src="/hero_background.png"
                     alt="Construction Site"
                     fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-tr from-primary/80 to-transparent mix-blend-multiply" />
@@ -573,36 +577,36 @@ export default function Home() {
         </section>
 
         {/* ══════════════════ Contact Section ══════════════════ */}
-        <section id="contact" className="py-16 lg:py-24 bg-foreground text-background">
+        <section id="contact" className="py-16 lg:py-24 bg-[#023969] text-[#f4f8fb]">
           <div className="container mx-auto px-6 md:px-12">
             <div className="grid lg:grid-cols-2 gap-16">
               <div>
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">
                   Ready to Build?
                 </h2>
-                <p className="text-background/70 text-lg mb-10 max-w-md">
+                <p className="text-[#f4f8fb]/70 text-lg mb-10 max-w-md">
                   Get a comprehensive quote for your next project. Fill out the
                   form or reach us directly.
                 </p>
 
-                <div className="space-y-6 text-background/80">
+                <div className="space-y-6 text-[#f4f8fb]/80">
                   <div className="flex items-center gap-4">
-                    <div className="bg-background/10 p-3 rounded-full">
+                    <div className="bg-[#f4f8fb]/10 p-3 rounded-full">
                       <Phone size={20} />
                     </div>
                     <div>
-                      <p className="text-sm text-background/60 mb-0.5">
+                      <p className="text-sm text-[#f4f8fb]/60 mb-0.5">
                         Call Us
                       </p>
                       <p className="font-medium">+91 79041 38705</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="bg-background/10 p-3 rounded-full">
+                    <div className="bg-[#f4f8fb]/10 p-3 rounded-full">
                       <Mail size={20} />
                     </div>
                     <div>
-                      <p className="text-sm text-background/60 mb-0.5">
+                      <p className="text-sm text-[#f4f8fb]/60 mb-0.5">
                         Email Us
                       </p>
                       <p className="font-medium">omdealer7@gmail.com</p>
@@ -610,11 +614,11 @@ export default function Home() {
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="flex items-start gap-4">
-                      <div className="bg-background/10 p-3 rounded-full shrink-0">
+                      <div className="bg-[#f4f8fb]/10 p-3 rounded-full shrink-0">
                         <MapPin size={20} />
                       </div>
                       <div>
-                        <p className="text-sm text-background/60 mb-0.5">
+                        <p className="text-sm text-[#f4f8fb]/60 mb-0.5">
                           Visit Us
                         </p>
                         <p className="font-medium">
@@ -624,17 +628,23 @@ export default function Home() {
                     </div>
                     
                     {/* Small Map Embed */}
-                    <div className="w-full h-[250px] rounded-2xl overflow-hidden shadow-lg border border-background/20 mt-2 lg:ml-14 max-w-sm">
+                    <a 
+                      href="https://maps.google.com/maps?q=13.1965099,80.183964"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full h-[250px] rounded-2xl overflow-hidden shadow-lg border border-background/20 mt-2 lg:ml-14 max-w-sm relative group"
+                    >
+                      <div className="absolute inset-0 z-10 bg-transparent cursor-pointer group-hover:bg-white/5 transition-colors" title="Open in Google Maps"></div>
                       <iframe 
                         width="100%" 
                         height="100%" 
-                        style={{ border: 0 }} 
+                        style={{ border: 0, pointerEvents: "none" }} 
                         loading="lazy" 
                         allowFullScreen 
                         src={`https://maps.google.com/maps?q=13.1965099,80.183964&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                       >
                       </iframe>
-                    </div>
+                    </a>
                   </div>
                 </div>
               </div>
