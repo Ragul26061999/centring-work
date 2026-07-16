@@ -631,7 +631,7 @@ export default function Home() {
                         style={{ border: 0 }} 
                         loading="lazy" 
                         allowFullScreen 
-                        src={`https://maps.google.com/maps?q=${encodeURIComponent("55, Madavaram Red Hills Rd, Red Hills, Naravarikuppam, Chennai, Tamil Nadu 600052")}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                        src={`https://maps.google.com/maps?q=13.1965099,80.183964&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                       >
                       </iframe>
                     </div>
