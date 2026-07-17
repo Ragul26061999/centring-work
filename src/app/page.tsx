@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, animate, useInView } from "framer-motion";
 import {
   ArrowRight,
   CheckCircle2,
@@ -63,11 +63,42 @@ function ParallaxBackground({
   );
 }
 
+/* ─────────────────────── Animated Number Component ─────────────────────── */
+function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+
+  useEffect(() => {
+    if (inView) {
+      const controls = animate(0, value, {
+        duration: 2.5,
+        ease: "easeOut",
+        onUpdate(v) {
+          if (ref.current) {
+            ref.current.textContent = Math.round(v) + suffix;
+          }
+        }
+      });
+      return () => controls.stop();
+    }
+  }, [inView, value, suffix]);
+
+  return <span ref={ref}>0{suffix}</span>;
+}
+
 /* ───────────────────────────── Main Page ───────────────────────────── */
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Force scroll to top on reload
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+    }
+  }, []);
 
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -155,7 +186,7 @@ export default function Home() {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? "bg-background/95 backdrop-blur-lg shadow-md border-b border-border/40 py-3"
+            ? "bg-background/95 backdrop-blur-lg shadow-md py-3"
             : "bg-gradient-to-b from-background/95 via-background/70 to-transparent pt-6 pb-12"
         }`}
       >
@@ -263,7 +294,7 @@ export default function Home() {
             speed={0.2}
             priority
             overlay={
-              <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] md:bg-black/10 md:dark:bg-black/30 md:backdrop-blur-none z-10 transition-all" />
+              <div className="absolute inset-0 bg-background/70 backdrop-blur-[2px] md:bg-black/10 md:backdrop-blur-none z-10 transition-all" />
             }
           />
 
@@ -352,7 +383,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="group bg-slate-50 dark:bg-zinc-900/50 rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+                className="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full"
               >
                 <div className="relative h-64 overflow-hidden shrink-0">
                   <Image
@@ -382,7 +413,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="group bg-slate-50 dark:bg-zinc-900/50 rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+                className="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full"
               >
                 <div className="relative h-64 overflow-hidden shrink-0">
                   <Image
@@ -412,7 +443,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="group bg-slate-50 dark:bg-zinc-900/50 rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+                className="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full"
               >
                 <div className="relative h-64 overflow-hidden shrink-0">
                   <Image
@@ -512,14 +543,18 @@ export default function Home() {
                   className="absolute -bottom-12 left-4 right-4 md:-bottom-8 md:-left-8 md:right-auto bg-background p-4 sm:p-6 rounded-2xl shadow-2xl border border-border flex items-center justify-around md:justify-start gap-3 sm:gap-6 z-20"
                 >
                   <div className="text-center md:text-left">
-                    <div className="text-3xl sm:text-4xl font-black text-primary">500+</div>
+                    <div className="text-3xl sm:text-4xl font-black text-primary">
+                      <AnimatedNumber value={500} suffix="+" />
+                    </div>
                     <div className="text-xs sm:text-sm font-medium text-foreground/70 uppercase tracking-wider mt-1">
                       Projects Completed
                     </div>
                   </div>
                   <div className="w-px h-12 sm:h-16 bg-border" />
                   <div className="text-center md:text-left">
-                    <div className="text-3xl sm:text-4xl font-black text-primary">15y</div>
+                    <div className="text-3xl sm:text-4xl font-black text-primary">
+                      <AnimatedNumber value={15} suffix="y" />
+                    </div>
                     <div className="text-xs sm:text-sm font-medium text-foreground/70 uppercase tracking-wider mt-1">
                       Industry Experience
                     </div>
@@ -752,7 +787,7 @@ export default function Home() {
       </main>
 
       {/* ══════════════════ Footer ══════════════════ */}
-      <footer className="bg-[#eef5fa] dark:bg-[#0a2033] text-foreground/80 py-12 lg:py-16">
+      <footer className="bg-[#eef5fa] text-foreground/80 pt-12 pb-6 lg:pt-16 lg:pb-8">
         <div className="container mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-2">
@@ -841,18 +876,15 @@ export default function Home() {
               &copy; {new Date().getFullYear()} Om Dealer Centering Materials. All
               rights reserved.
             </p>
-            <div className="flex gap-6">
+            <div className="flex items-center gap-1 mr-16 md:mr-24 text-foreground/70">
+              Created by : 
               <a
-                href="#"
-                className="hover:text-primary transition-colors"
+                href="http://innovacentra.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-primary font-bold transition-colors"
               >
-                Terms of Service
-              </a>
-              <a
-                href="#"
-                className="hover:text-primary transition-colors"
-              >
-                Privacy Policy
+                innovacentra
               </a>
             </div>
           </div>
